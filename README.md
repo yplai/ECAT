@@ -3,17 +3,15 @@ Evolutionary Cluster-based Association Test (ECAT) is an adaptation of linear mi
 
 # Required packages
 
-
-```
 - Phylogenetic tree reconstruction
 [PAUP](https://paup.phylosolutions.com)
 - Association test
 [GEMMA](https://github.com/genetics-statistics/GEMMA) 
-```
+
 
 # Input data format
 
-After calling variants from the assembled genomes, we generate a multiple sequence alignment (MSA) of all samples by aligning them to a reference genome. Here, we use a collection of 30 clinical isolates of *Mycobacterium tuberculosis* and the reference genome H37Rv (GenBank: NC_000962.2) as an example, sample_30h.align. The format of the MSA is descibed in details as follows. The first 31 lines of the MSA consists of the orders of strains where the first one is the reference. Other lines represent the aigned sequences for sites across the genome. The sites exhibiting SNPs are labeled with '*' and annotated. The format of information for each site are coordinate, gene name, alias of the gene name if any, dot ('.'), aligned sequence of nucleotides, polymorphic site ('*'), annotation if it locates within a gene.
+After calling variants from the assembled genomes, we generate a multiple sequence alignment (MSA) of all samples by aligning them to a reference genome. Here, we use a collection of 30 clinical isolates of *Mycobacterium tuberculosis* and the reference genome H37Rv (GenBank: NC_000962.2) as an example, sample_30h.align. The format of the MSA is descibed in details as follows. The first 31 lines of the MSA consists of the orders of strains where the first one is the reference. Other lines represent the aigned sequences for sites across the genome. The sites exhibiting SNPs are labeled with asterisks and annotated. The format of information for each site are coordinate, gene name, alias of the gene name if any, a dot symbol, an aligned sequence of nucleotides, an asterisk if it is a polymorphic site , an annotation if it locates within a gene.
     
 ```
 # H37Rv
@@ -87,13 +85,13 @@ python get_snp.py sample_30h.align > sample_30h.snp
 python filter_synon_snp.py sample_30h.snp > sample_30h_nonsyn.snp
 ```
 
-, where we keep all SNPs within the intergenic regions and $rrs$ (16S rRNA).
+, where we keep all SNPs within the intergenic regions and *rrs* (16S rRNA).
 
 
 
 # Run ECAT
 
-The input files are the alignment of all nonsynonymous SNPs, the reconstructed phylogenetic tree, and a list of phenotypic traits of interests.
+The input files are an alignment of all nonsynonymous SNPs, a phylogenetic tree, and a list of phenotypic traits of interests.
 
 
 ## Phase I--Homoplasy Inference
@@ -153,7 +151,7 @@ and finally compute the centered kinship by running
 
 ```
 ./gemma.linux -g sample_30h_fil_site_gemma -p s30h_INH_bin.txt -maf 0 -gk 1  -o sample_30h_grm 
-
+```
 
 - Association Test using GEMMA
 
@@ -174,4 +172,8 @@ python assign_pwald_region_ant_pos.py PATH/output/sample_30h_region_HI_15k_INH.a
 # Citing ECAT
 
 # License
+
+Authors: Yi-Pin Lai and Thomas R. Ioerger.
+
+ECAT is a free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/) as published by the Free Software Foundation.
 
