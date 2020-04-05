@@ -80,7 +80,7 @@ After calling variants from the assembled genomes, we generate a multiple sequen
 python get_snp.py sample_30h.align > sample_30h.snp
 ```
 
-  , where we exclude ambiguous sites, repetive regions, and PE/PGRS genes. 
+   , where we exclude ambiguous sites, repetive regions, and PE/PGRS genes. 
 
 
 2. We use both synonymous and nonsynonymous SNPs to generate a phylogenetic tree by maximum parsomony using PAUP. The tree is named as sample_30h.tre.
@@ -92,7 +92,7 @@ python get_snp.py sample_30h.align > sample_30h.snp
 python filter_synon_snp.py sample_30h.snp > sample_30h_nonsyn.snp
 ```
 
-  , where we keep all SNPs within the intergenic regions and *rrs* (16S rRNA).
+   , where we keep all SNPs within the intergenic regions and *rrs* (16S rRNA).
 
 
 
@@ -109,7 +109,7 @@ python filter_synon_snp.py sample_30h.snp > sample_30h_nonsyn.snp
 python count_HI.py sample_30h.tre sample_30h_nonsyn.snp > sample_30h_nonsyn_HI.snp
 ```
 
-  , where the last column of each site is the homoplasy index (HI), which is the number of excess changes plus 1. Thus, a site with 1 HI means that it does not need extra changes after being mapped onto the tree, which is homoplasy-free. In contrast, a site with HI over 1 represents it is homoplasic.
+   , where the last column of each site is the homoplasy index (HI), which is the number of excess changes plus 1. Thus, a site with 1 HI means that it does not need extra changes after being mapped onto the tree, which is homoplasy-free. In contrast, a site with HI over 1 represents it is homoplasic.
 
 
 ## Phase II--Clustered Region Identification
@@ -120,10 +120,10 @@ python count_HI.py sample_30h.tre sample_30h_nonsyn.snp > sample_30h_nonsyn_HI.s
 python chuck_genome_cluster_locmu_HI.py sample_30h_nonsyn_HI.snp 7500 20 > sample_30h_nonsyn_HI_region_15kwin20
 ```
 
-  , where the second argument, 7500, is the half size of a sliding window for calculating the local mutation rate 
+   , where the second argument, 7500, is the half size of a sliding window for calculating the local mutation rate 
 and the third argument, 20, is a given span of SNPs as a region that we group adjacent sites up to the span.
 
-Here, we will obtain a list of non-overlapping clustered regions sorted by the adjusted $p$-values with 5% FDR cutoff.  
+  Here, we will obtain a list of non-overlapping clustered regions sorted by the adjusted *p*-values with 5% FDR cutoff.  
 
 
 ## Phase III--Association Test 
@@ -148,13 +148,13 @@ python convert_gemma_format_region.py sample_30h_nonsyn.snp sample_30h_nonsyn_HI
 python filter_ds.py sample_30h_nonsyn.snp > sample_30h_nonsyn_fil.snp
 ```
 
-  , and then convert it to the format required by GEMMA
+   , and then convert it to the format required by GEMMA
 
 ```
 python convert_gemma_format.py sample_30h_nonsyn_fil.snp > sample_30h_fil_site_gemma
 ```
 
-  and finally compute the centered kinship by running
+   and finally compute the centered kinship by running
 
 ```
 ./gemma.linux -g sample_30h_fil_site_gemma -p s30h_INH_bin.txt -maf 0 -gk 1  -o sample_30h_grm 
