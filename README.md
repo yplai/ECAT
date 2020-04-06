@@ -18,7 +18,11 @@ Evolutionary Cluster-based Association Test (ECAT) is an adaptation of linear mi
 
 # Input data format
 
-After calling variants from the assembled genomes, we generate a multiple sequence alignment (MSA) of all samples by aligning them to a reference genome. Here, we use a collection of 30 clinical isolates of *Mycobacterium tuberculosis* and the reference genome H37Rv (GenBank: NC_000962.2) as an example, sample_30h.align. The format of the MSA is descibed in details as follows. The first 31 lines of the MSA consists of the orders of strains where the first one is the reference. Other lines represent the aigned sequences for sites across the genome. The sites exhibiting SNPs are labeled with asterisks and annotated. The format of information for each site are coordinate, gene name, alias of the gene name if any, a dot symbol, an aligned sequence of nucleotides, an asterisk if it is a polymorphic site , an annotation if the SNP occurs within a gene.
+After calling variants from the assembled genomes, we generate a multiple sequence alignment (MSA) of all samples by aligning them to a reference genome. Here, we use a collection of 30 clinical isolates of *Mycobacterium tuberculosis* and the reference genome H37Rv (GenBank: NC_000962.2) as an example. The format of the MSA is described in details as follows. 
+
+File name: sample_30h.align
+
+The first 31 lines of the MSA consist of the strain IDs where the first one is the reference. Lines starting from the 32nd represent the aigned sequences for sites across the genome. The SNPs are labeled with asterisks and annotated with a.a information if it is within gene regions. The information for each site includes coordinate, gene name, alias of the gene name if any, a dot symbol, an aligned sequence of nucleotides, an asterisk if it is a polymorphic site , an annotation if the SNP occurs within a gene.
     
 ```
 # H37Rv
@@ -69,30 +73,32 @@ After calling variants from the assembled genomes, we generate a multiple sequen
 81      Rv0001     dnaA       . CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC  
 82      Rv0001     dnaA       . GGGGGGGGGGGGGGGGGGGGGCGGGGGGGGG * C:[D28H]
 ...
+1700    non        coding     . GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG  
+1701    non        coding     . TTTTTTTTTTTTTTTTTTTTTTTTCTTTTTT *
+1702    non        coding     . CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC  
+...
 ```   
  
 
 ## Data preprocessing
 
-1. We obtain all SNPs by running
+1. We obtain all SNPs, excluding ambiguous sites, repetive regions, and PE/PGRS genes, by running
 
 ```
 python get_snp.py sample_30h.align > sample_30h.snp
 ```
 
-   , where we exclude ambiguous sites, repetive regions, and PE/PGRS genes. 
 
 
 2. We use both synonymous and nonsynonymous SNPs to generate a phylogenetic tree by maximum parsomony using PAUP. The tree is named as sample_30h.tre.
 
 
-3. We filter out synonymous SNPs by running
+3. We filter out synonymous SNPs, excepting SNPs within *rrs* (16S rRNA), by running
 
 ```
 python filter_synon_snp.py sample_30h.snp > sample_30h_nonsyn.snp
 ```
 
-   , where we keep all SNPs within the intergenic regions and *rrs* (16S rRNA).
 
 
 
@@ -103,13 +109,13 @@ python filter_synon_snp.py sample_30h.snp > sample_30h_nonsyn.snp
 
 ## Phase I--Homoplasy Inference
 
-- We calculate the homoplasy count for each site by running
+- We apply Sankoff's algorithm to calculate the homoplasy count for each site by running
 
 ```
 python count_HI.py sample_30h.tre sample_30h_nonsyn.snp > sample_30h_nonsyn_HI.snp
 ```
 
-   , where the last column of each site is the homoplasy index (HI), which is the number of excess changes plus 1. Thus, a site with 1 HI means that it does not need extra changes after being mapped onto the tree, which is homoplasy-free. In contrast, a site with HI over 1 represents it is homoplasic.
+  The last column in the output file for each site is the homoplasy index (HI), which is the number of excess changes plus 1. Thus, a site with 1 HI means that it does not need extra changes after being mapped onto the tree, which is homoplasy-free. In contrast, a site with HI over 1 represents it is homoplasic.
 
 
 ## Phase II--Clustered Region Identification
@@ -134,8 +140,8 @@ and the third argument, 20, is a given span of SNPs as a region that we group ad
 
 - Genotypes
 
-  We apply a burden test to group SNPs within each region and convert them to the format required by GEMMA.
-
+  We apply a binary collapsing method (burden test) to group SNPs within each region. For each clustered region, polymorphic sites are pooled within the region. If a strain that has at least one mutation among the sites within the boundaries of the region, the genotype of the strain within the region will be marked as having a mutation. We then convert them to the format required by GEMMA.
+  
 ```
 python convert_gemma_format_region.py sample_30h_nonsyn.snp sample_30h_nonsyn_HI_region_15kwin20 > sample_30h_nonsyn_HI_region_gemma_15k
 ```
@@ -168,7 +174,7 @@ python convert_gemma_format.py sample_30h_nonsyn_fil.snp > sample_30h_fil_site_g
 
 - Multiple test correction 
 
-  For multiple test coorection, we adjust the Wald P values by 5% flase discovery rate (FDR), annotate the regions, and sort the results
+  For multiple test coorection, we adjust the Wald P values by 5% flase discovery rate (FDR), annotate the regions, and sort the results by adjusted *p*-values.
 
 ```
 python assign_pwald_region_ant_pos.py PATH/output/sample_30h_region_HI_15k_INH.assoc.txt s30h_INH_bin.txt sample_30h_nonsyn_HI_region_gemma_15k H37Rv.prot_table sample_30h_nonsyn_HI_region_15kwin20 | sort -gk 21 > sample_30h_region_homo_15k_INH_lmm_sorted 
@@ -182,5 +188,5 @@ python assign_pwald_region_ant_pos.py PATH/output/sample_30h_region_HI_15k_INH.a
 
 Authors: Yi-Pin Lai and Thomas R. Ioerger.
 
-ECAT is a free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](http://www.gnu.org/licenses/) as published by the Free Software Foundation.
+ECAT is a free pipeline. It can be redistributed and/or modified under the terms of the [GNU General Public License](http://www.gnu.org/licenses/) as published by the Free Software Foundation.
 
